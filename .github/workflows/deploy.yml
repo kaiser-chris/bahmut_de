@@ -32,7 +32,7 @@ jobs:
           source: release.zip
           target: ~/
           
-      - name: executing remote ssh commands using password
+      - name: Execute deployment
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEPLOYMENT_HOST }}
