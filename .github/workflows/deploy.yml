@@ -19,7 +19,7 @@ jobs:
         uses: TheDoctor0/zip-release@0.4.2
         with:
           filename: release.zip
-          exclusions: '*.git* *README.md *release.tar.gz'
+          exclusions: '*.git* *.docs* *README.md *release.tar.gz'
           type: zip
           
       - name: Upload release
