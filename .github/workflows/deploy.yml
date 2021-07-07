@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Prepare deployment
+        uses: TheDoctor0/zip-release@0.4.2
+        with:
+          filename: release.zip
+          exclusions: '*.git* *README.md *release.tar.gz'
+          type: zip
+          
+      - name: Upload release
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEPLOYMENT_HOST }}
+          username: ${{ secrets.DEPLOYMENT_USER }}
+          key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
+          port: ${{ secrets.DEPLOYMENT_PORT }}
+          source: release.zip
+          target: ~/
+          
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOYMENT_HOST }}
+          username: ${{ secrets.DEPLOYMENT_USER }}
+          key: ${{ secrets.DEPLOYMENT_SSH_KEY }}
+          port: ${{ secrets.DEPLOYMENT_PORT }}
+          script: |
+            rm -r ${{ secrets.DEPLOYMENT_DIRECTORY }}/*
+            unzip release.zip -d ${{ secrets.DEPLOYMENT_DIRECTORY }}
+            rm release.zip
